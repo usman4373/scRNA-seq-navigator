@@ -161,7 +161,7 @@ merged_samples <- merge(normal_merged, LM_merged)
 
 ---
 
-UMAP and t-SNE - Cell Clusters
+### UMAP and t-SNE - Cell Clusters
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/06-umap.png" width="49%">
@@ -170,13 +170,13 @@ UMAP and t-SNE - Cell Clusters
 
 ---
 
-UMAP - Clusters Grouped By Condition
+### UMAP - Clusters Grouped By Condition
 
 ![umap-condition](data/07-umap_condition.png)
 
 ---
 
-t-SNE - Clusters Grouped By Condition
+### t-SNE - Clusters Grouped By Condition
 
 ![tsne-condition](data/09-tsne_condition.png)
 
@@ -189,7 +189,7 @@ t-SNE - Clusters Grouped By Condition
 
 ---
 
-UMAP and t-SNE Annotated Cell Clusters
+### UMAP and t-SNE Annotated Cell Clusters
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/10-umap_annotated.png" width="49%">
@@ -198,13 +198,13 @@ UMAP and t-SNE Annotated Cell Clusters
 
 ---
 
-UMAP - Annotated Cell Clusters Grouped By Condition
+### UMAP - Annotated Cell Clusters Grouped By Condition
 
 ![umap-annotated-condition](data/11-umap_annotated_condition.png)
 
 ---
 
-t-SNE - Annotated Cell Clusters Grouped By Condition
+### t-SNE - Annotated Cell Clusters Grouped By Condition
 
 ![tsne-annotated-condition](data/13-tsne_annotated_condition.png)
 
@@ -266,13 +266,13 @@ t-SNE - Annotated Cell Clusters Grouped By Condition
 
 ---
 
-UMAP - Before and After Batch-Effect Correction
+### UMAP - Before and After Batch-Effect Correction
 
 ![umap-harmony](14-umap-batch.png)
 
 ---
 
-t-SNE - Before and After Batch-Effect Correction
+### t-SNE - Before and After Batch-Effect Correction
 
 ![tsne-harmony](15-tsne-batch.png)
 
@@ -366,6 +366,8 @@ This script creates interactive 3D visualizations of single-cell data using UMAP
 
 ![volcano](data/20-volcano.png)
 
+---
+
 ## 06. Heatmap
 
 This script generates gene-specific heatmaps to visualize gene expression patterns across cell types and conditions.
@@ -396,6 +398,8 @@ This script generates gene-specific heatmaps to visualize gene expression patter
   <img src="data/22-heatmap.png" width="49%">
 </div>
 
+---
+
 ## 07. Boxplot
 
 This script creates box plots to compare gene expression across conditions and specific cell types.
@@ -425,6 +429,8 @@ This script creates box plots to compare gene expression across conditions and s
   <img src="data/23-boxplot.png" width="49%">
   <img src="data/24-boxplot.png" width="49%">
 </div>
+
+---
 
 ## 📚 Citation
 
