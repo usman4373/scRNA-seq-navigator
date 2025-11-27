@@ -159,15 +159,14 @@ merged_samples <- merge(normal_merged, LM_merged)
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/06-umap.png" width="49%">
-  <img src="data/07-umap_condition.png" width="49%">
+  <img src="data/08-tsne.png" width="49%">
 </div>
 
 ---
 
-<div style="display:flex; justify-content:space-between;">
-  <img src="data/08-tsne.png" width="49%">
-  <img src="data/09-tsne_condition.png" width="49%">
-</div>
+![umap-condition](data/07-umap-condition.png)
+
+![tsne-condition](data/09-tsne_condition.png)
 
 ### D. Cell Type Annotation
 
