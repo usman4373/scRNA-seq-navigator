@@ -49,8 +49,7 @@ Rscript install_packages.R
 ```
 
 - Alternatively, if the above does not work, open `install_packages.R` file in RStudio
-- Click the "Source" button in the top-right of the script editor
-- In R console:
+- Click the "Source" button in the top-right of the script editor OR in R console run:
 
 ```
 # Navigate to the script directory first, then:
