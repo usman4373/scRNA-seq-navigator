@@ -140,7 +140,7 @@ merged_samples <- merge(normal_merged, LM_merged)
 - Identifies highly variable genes
 - Visualizes top variable features
 
-![highly-variable-features](data/03-hvfs.png)
+<img src="data/03-hvfs.png" width="400px" />
 
 ### C. Dimensionality Reduction & Clustering
 
