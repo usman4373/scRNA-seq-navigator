@@ -268,13 +268,13 @@ merged_samples <- merge(normal_merged, LM_merged)
 
 ### UMAP - Before and After Batch-Effect Correction
 
-![umap-harmony](14-umap-batch.png)
+![umap-harmony](data/14-umap-batch.png)
 
 ---
 
 ### t-SNE - Before and After Batch-Effect Correction
 
-![tsne-harmony](15-tsne-batch.png)
+![tsne-harmony](data/15-tsne-batch.png)
 
 ### F. Cell Type Annotation
 
