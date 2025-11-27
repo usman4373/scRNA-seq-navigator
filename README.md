@@ -4,6 +4,7 @@
 ## 📑 Table of contents
 
 - [📝 Overview](#-overview)
+- [Installation](#installation)
 - [Input Files Format](#input-files-format)
 - [01. Merging Samples](#01-merging-samples)
 - [02. Single Cell RNA Sequencing Analysis](#02-single-cell-rna-sequencing-analysis)
@@ -37,6 +38,24 @@
 | `05-volcano_plotr.R` | Generates publication-ready volcano plots to visualize differential gene expression results |
 | `06-heatmapr.R` | Produces clustered heatmaps showing gene expression patterns across cell types and conditions |
 | `07-boxplotr.R` | Creates comparative box plots to analyze gene expression differences across experimental conditions and/or cell types |
+
+## Installation
+
+- Navigate to the directory containing `install_packages.R` file
+- Open terminal and run:
+
+```
+Rscript install_packages.R
+```
+
+- Alternatively, if the above does not work, open `install_packages.R` file in RStudio
+- Click the "Source" button in the top-right of the script editor
+- In R console:
+
+```
+# Navigate to the script directory first, then:
+source("install_packages.R")
+```
 
 ## Input Files Format
 
