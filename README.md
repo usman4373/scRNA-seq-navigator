@@ -150,12 +150,18 @@ merged_samples <- merge(normal_merged, LM_merged)
 - Performs non-linear dimensionality reduction (UMAP & t-SNE)
 - Visualizes clusters and conditions
 
+---
+
+### PCA and Elbow Plot
+
 <div style="display:flex; justify-content:space-between;">
   <img src="data/04-pca.png" width="49%">
   <img src="data/05-elbow.png" width="49%">
 </div>
 
 ---
+
+UMAP and t-SNE - Cell Clusters
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/06-umap.png" width="49%">
@@ -164,7 +170,13 @@ merged_samples <- merge(normal_merged, LM_merged)
 
 ---
 
-![umap-condition](data/07-umap-condition.png)
+UMAP - Clusters Grouped By Condition
+
+![umap-condition](data/07-umap_condition.png)
+
+---
+
+t-SNE - Clusters Grouped By Condition
 
 ![tsne-condition](data/09-tsne_condition.png)
 
@@ -175,17 +187,26 @@ merged_samples <- merge(normal_merged, LM_merged)
 - Assigns cell types and handles low-confidence annotations
 - Updates metadata with cell type classifications
 
+---
+
+UMAP and t-SNE Annotated Cell Clusters
+
 <div style="display:flex; justify-content:space-between;">
   <img src="data/10-umap_annotated.png" width="49%">
-  <img src="data/11-umap_annotated_condition.png" width="49%">
+  <img src="data/12-tsne_annotated.png" width="49%">
 </div>
 
 ---
 
-<div style="display:flex; justify-content:space-between;">
-  <img src="data/12-tsne_annotated.png" width="49%">
-  <img src="data/13-tsne_annotated_condition.png" width="49%">
-</div>
+UMAP - Annotated Cell Clusters Grouped By Condition
+
+![umap-annotated-condition](data/11-umap_annotated_condition.png)
+
+---
+
+t-SNE - Annotated Cell Clusters Grouped By Condition
+
+![tsne-annotated-condition](data/13-tsne_annotated_condition.png)
 
 ### E. Visualization & Analysis
 
@@ -243,7 +264,15 @@ merged_samples <- merge(normal_merged, LM_merged)
 - Generates new embeddings on corrected data
 - Creates comparative visualizations showing integration effectiveness
 
+---
+
+UMAP - Before and After Batch-Effect Correction
+
 ![umap-harmony](14-umap-batch.png)
+
+---
+
+t-SNE - Before and After Batch-Effect Correction
 
 ![tsne-harmony](15-tsne-batch.png)
 
