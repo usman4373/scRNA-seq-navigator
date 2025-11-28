@@ -152,6 +152,12 @@ merged_samples <- merge(normal_merged, LM_merged)
   <img src="data/02-filtered_data.png" width="49%">
 </div>
 
+**Note: Before saving plots, adjust the plot viewing window size in RStudio to match the intended resolution and aspect ratio.**
+
+```
+ggsave(file = "raw_data.png", Plot1, dpi = 600, bg = "white")
+```
+
 ### B. Data Normalization & Feature Selection
 
 - Normalizes data using log normalization
