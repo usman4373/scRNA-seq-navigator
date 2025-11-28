@@ -457,8 +457,81 @@ saveRDS(data_subset, file = "data_subset.rds")
 ```
 
 - Performs differential expression between:
-    - Same cell type across conditions (Normal vs PD)
-    - Different cell types within same condition
+- Same cell type across conditions (Normal vs PD)
+
+```r
+      data$celltype.condition <- paste(data$sctype_classification, data$condition, sep = "_")
+Idents(data) <- "celltype.condition"
+levels(data)
+
+dff_markers <- FindMarkers(data, ident.1 = "Memory CD4+ T cells_LM",
+                           ident.2 = "Memory CD4+ T cells_Normal", min.pct = 0.1,
+                           test.use = "wilcox", verbose = TRUE, only.pos = FALSE)
+# Apply FDR
+dff_markers$fdr = p.adjust(dff_markers$p_val, method='fdr')
+write.csv(dff_markers, file = "Memory CD4+ T cells_DEGs.csv") # Required for volcano plot
+
+dff_up_markers <- subset(dff_markers, avg_log2FC > 0.25)
+dff_dn_markers <- subset(dff_markers, avg_log2FC < -0.25)
+# Save degs results
+write.csv(dff_up_markers, file = "Memory CD4+ T cells_up_markers.csv")
+write.csv(dff_dn_markers, file = "Memory CD4+ T cells_dn_markers.csv")
+```
+      
+- Different cell types regardless of condition
+
+```r
+Idents(data) <- "sctype_classification"
+levels(data)
+degs <- FindMarkers(data, ident.1 = "Cancer cells",
+                    ident.2 = NULL, test.use = "wilcox",
+                    only.pos = FALSE)
+# Apply FDR
+degs$fdr = p.adjust(degs$p_val, method='fdr')
+write.csv(degs, file = "Cancer cells_DEGs.csv") # Required for volcano plot
+
+degs_up <- subset(degs, avg_log2FC > 0.25)
+degs_down <- subset(degs, avg_log2FC < -0.25)
+# Save degs results
+write.csv(degs_up, file = "Cancer_cells_up_markers.csv")
+write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
+```
+
+- Different cell types in different conditions
+
+```r
+data$celltype.condition <- paste(data$sctype_classification, data$condition, sep = "_")
+Idents(data) <- "celltype.condition"
+levels(data)
+# DEGs of Cancer cells in diseased condition vs All other cell types in Normal condition
+degs <- FindMarkers(data, ident.1 = "Cancer cells_LM",
+                    ident.2 = c("Macrophages_Normal",
+                                "Natural killer  cells_Normal",
+                                "Basophils_Normal",
+                                "Non-classical monocytes_Normal",
+                                "CD8+ NKT-like cells_Normal",
+                                "Memory CD4+ T cells_Normal",
+                                "Myeloid Dendritic cells_Normal",
+                                "Pre-B cells_Normal",
+                                "Endothelial_Normal",
+                                "Classical Monocytes_Normal",
+                                "Plasmacytoid Dendritic cells_Normal",
+                                "γδ-T cells_Normal",
+                                "Memory B cells_Normal",
+                                "Naive CD4+ T cells_Normal"
+                    ), test.use = "wilcox",
+                    only.pos = FALSE)
+# Apply FDR
+degs$fdr = p.adjust(degs$p_val, method='fdr')
+write.csv(degs, file = "Cancer cells_DEGs.csv") # Required for volcano plot
+
+degs_up <- subset(degs, avg_log2FC > 0.25)
+degs_down <- subset(degs, avg_log2FC < -0.25)
+# Save degs results
+write.csv(degs_up, file = "Cancer_cells_up_markers.csv")
+write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
+```
+
 - Identifies up/down-regulated genes
 - Applies statistical filtering and FDR correction
 - Exports marker gene lists
