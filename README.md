@@ -536,6 +536,13 @@ write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
 - Applies statistical filtering and FDR correction
 - Exports marker gene lists
 
+**Note:**
+- **Join layers of the Seurat object before performing differential expression**
+
+```r
+data <- JoinLayers(data)
+```
+
 ### Outputs
 
 - The script produces:
@@ -792,12 +799,47 @@ This script creates interactive 3D visualizations of single-cell data using UMAP
 - Formats data for volcano plot visualization
 - Sets up gene identifiers and statistical columns
 
+```r
+file_path <- "Cancer cells_DEGs.csv"
+degs <- read_csv(file_path, show_col_types = FALSE)
+degs <- as.data.frame(degs)              
+rownames(degs) <- degs$gene              
+degs$gene <- NULL
+```
+
 ### B. Plot Generation
 
 - Uses EnhancedVolcano package for advanced plotting
-- Maps log2 fold changes against adjusted p-values
+- Maps log2 fold changes against adjusted p-values (fdr)
 - Applies statistical cutoffs for significance
 - Customizes colors for different significance categories
+
+```r
+volc <- EnhancedVolcano(
+  degs,
+  lab              = NA,
+  x                = "avg_log2FC",
+  y                = "fdr",
+  pCutoff          = 0.05,
+  FCcutoff         = 2,  # Adjust log FC value cutoff
+  title            = "Cancer cells-LM vs All Other Cell Types-Normal",   # Change according to your celltype degs file
+  pointSize        = 2.0,
+  labSize          = 3.0,
+  legendLabSize    = 10,
+  legendPosition    = "right",
+  legendIconSize   = 4.0,
+  drawConnectors   = FALSE,
+  widthConnectors  = 0.5,
+  gridlines.major  = TRUE,
+  gridlines.minor  = TRUE,
+  col = c(
+    'grey50',             # Insignificant p-value and log2FC
+    '#1DCD9F',            # Insignificant log2FC
+    'royalblue',          # Insignificant p-value
+    '#FF0B55'             # Significant p-value and log2FC
+  ))
+```
+- Adjust `FCcutoff` and `title` according to your data
 
 ### C. Visualization & Export
 
@@ -818,8 +860,24 @@ This script generates gene-specific heatmaps to visualize gene expression patter
 ### A. Data Extraction
 
 - Selects genes of interest for visualization
-- Extracts expression data from Seurat object
+
+```r
+genes_of_interest <- c(
+  "CD247","RAC1","CALM1","CD3D","HLA-DQA1",
+  "HLA-DQA2","HLA-DPA1","HLA-DRA","CD74","CD3G"
+)
+```
+
+- Extracts expression data from the Seurat object
 - Combines expression data with metadata
+
+```r
+expr_mat <- GetAssayData(data, assay = "RNA", layer = "data")[genes_of_interest, ]
+expr_df <- as.data.frame(t(expr_mat))
+metadata <- data@meta.data
+expr_df$celltype <- metadata$sctype_classification
+expr_df$condition <- metadata$condition
+```
 
 ### B. Expression Analysis
 
