@@ -8,7 +8,6 @@
 - [Input Files Format](#input-files-format)
 - [01. Merging Samples](#01-merging-samples)
 - [02. Single Cell RNA Sequencing Analysis](#02-single-cell-rna-sequencing-analysis)
-      - [E. Manual Cell Type Annotation](#e-manual-cell-type-annotation)
 - [03. Multiple Datasets Integration](#03-multiple-datasets-integration)
 - [04. 3D UMAP and t-SNE Plots](#04-3d-umap-and-t-sne-plots)
 - [05. Volcano Plot](#05-volcano-plot)
@@ -376,13 +375,14 @@ for(j in unique(sctype_scores$cluster)){
 
 ### E. Manual Cell Type Annotation
 
+- If you want to annotate cell clusters based on your gene markers, then follow below:
 - Get the ScType database Excel file from [here](https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/ScTypeDB_full.xlsx)
 - Open the file and delete all existing data rows, keeping only the column headers (`tissueType`, `cellName`, `geneSymbolmore1`, `geneSymbolmore2`, and `shortName`)
 - Fill in the columns with your custom data:
     - `tissueType`: Your tissue of interest (e.g., "Immune")
     - `cellName`: The specific cell type (e.g., "T-cell")
     - `geneSymbolmore1`: The positive gene markers for that cell type, separated by commas (e.g., "CD3D,CD3E,CD8A")
-    - `geneSymbolmore2`: Alternative gene marker names for `geneSymbolmore1` (e.g., T3D). T3D is alternative to CD3D
+    - `geneSymbolmore2`: Alternative gene marker names for `geneSymbolmore1` (e.g., T3D). T3D is an alternative to CD3D
     - `shortName`: Short name of a specific cell type (e.g., Pro-B)
 - Save the file and provide its path to the sctype_annotate function in the code, as shown below
 
