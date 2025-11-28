@@ -554,14 +554,99 @@ write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
 ### A. Data Preparation
 
 - Loads and combines samples from multiple experimental datasets
+
+```r
+# Dataset 01 Samples
+s1 <- Read10X("samples/GSE231559/GSM7290763")
+s1 <- CreateSeuratObject(s1, project = "GSE231559-CRC1")
+
+s2 <- Read10X("samples/GSE231559/GSM7290769")
+s2 <- CreateSeuratObject(s2, project = "GSE231559-CRC2")
+
+s3 <- Read10X("samples/GSE231559/GSM7290770")
+s3 <- CreateSeuratObject(s3, project = "GSE231559-N1")
+
+s4 <- Read10X("samples/GSE231559/GSM7290772")
+s4 <- CreateSeuratObject(s4, project = "GSE231559-N2")
+
+# Dataset 02 Samples
+s5 <- Read10X("samples/GSE261012/GSM6432445")
+s5 <- CreateSeuratObject(s5, project = "GSE261012-CRC1")
+
+s6 <- Read10X("samples/GSE261012/GSM6432446")
+s6 <- CreateSeuratObject(s6, project = "GSE261012-CRC2")
+
+s7 <- Read10X("samples/GSE261012/GSM6432447")
+s7 <- CreateSeuratObject(s7, project = "GSE261012-N1")
+
+s8 <- Read10X("samples/GSE261012/GSM6432448")
+s8 <- CreateSeuratObject(s8, project = "GSE261012-N2")
+```
+  
 - Adds metadata labels for dataset origin and experimental conditions
+
+```r
+# Add metadata labels
+s1$dataset <- "GSE231559";  s1$condition <- "CRC"
+s2$dataset <- "GSE231559";  s2$condition <- "CRC"
+s3$dataset <- "GSE231559";  s3$condition <- "Control"
+s4$dataset <- "GSE231559";  s4$condition <- "Control"
+
+s5$dataset <- "GSE261012";  s5$condition <- "CRC"
+s6$dataset <- "GSE261012";  s6$condition <- "CRC"
+s7$dataset <- "GSE261012";  s7$condition <- "Control"
+s8$dataset <- "GSE261012";  s8$condition <- "Control"
+```
+
 - Merges all samples into a unified analysis object
+
+```r
+# combine all samples
+combined <- merge(s1, y = c(s2,s3,s4,s5,s6,s7,s8),
+                  add.cell.ids = c("GSE231559-CRC1","GSE231559-CRC2","GSE231559-N1","GSE231559-N2",
+                                   "GSE261012-CRC1","GSE261012-CRC2","GSE261012-N1","GSE261012-N2"))
+# Verify the merge
+table(combined$condition)
+table(combined$orig.ident)
+dim(combined)
+```
 
 ### B. Quality Control & Preprocessing
 
-- Clusters data without batch correction
+- Performs quality control, normalization, highly variable features, scaling, and PCA of the data (same as scRNA-seqr)
+- Performs cell clustering
+
+```r
+data <- FindNeighbors(data, dims = 1:20, reduction = "pca")
+data <- FindClusters(data, resolution = 0.6, algorithm = 4,
+                         cluster.name = "raw_clusters")
+```
+
 - Generates low-dimensional embeddings (UMAP/t-SNE) showing raw cluster patterns
+
+```r
+data <- RunUMAP(data, dims = 1:20, reduction = "pca",
+                    reduction.name = "umap.raw")
+
+data <- RunTSNE(data, dims = 1:20, reduction = "pca",
+                    reduction.name = "tsne.raw")
+```
+
 - Visualizes inherent batch effects and sample separation
+
+```r
+umap_data <- DimPlot(data, reduction = "umap.raw")
+umap_data
+
+tsne_data <- DimPlot(data, reduction = "tsne.raw")
+tsne_data
+
+umap_condition_data <- DimPlot(data, reduction = "umap.raw", group.by = "condition")
+umap_condition_data
+
+tsne_condition_data <- DimPlot(data, reduction = "tsne.raw", group.by = "condition")
+tsne_condition_data
+```
 
 ### C. Batch Effect Correction
 
@@ -569,11 +654,60 @@ write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
 - Creates harmonized dimensional space while preserving biological variation
 - Maintains dataset-specific biological signals while minimizing batch effects
 
+```r
+crt_data <- RunHarmony(data, group.by.vars = "dataset")
+```
+
 ### E. Integrated Data Analysis
 
 - Re-clusters cells using integrated dimensions
-- Generates new embeddings on corrected data
+
+```r
+crt_data <- FindNeighbors(crt_data, reduction = "harmony", dims = 1:20)
+crt_data <- FindClusters(crt_data, resolution = 0.6, algorithm = 4,
+                         cluster.name = "harmony_clusters")
+```
+
+- Generates new embeddings on corrected data and visualizes corrected data
+
+```r
+crt_data <- RunUMAP(crt_data, reduction = "harmony",
+                    dims = 1:20, reduction.name = "umap.harmony")
+crt_data <- RunTSNE(crt_data, reduction = "harmony", dims = 1:20,
+                    reduction.name = "tsne.harmony", reduction.key = "tsneharmony_")
+
+umap_crt <- DimPlot(crt_data, reduction = "umap.harmony")
+umap_crt
+
+tsne_crt <- DimPlot(crt_data, reduction = "tsne.harmony")
+tsne_crt
+
+umap_crt_condition <- DimPlot(crt_data, reduction = "umap.harmony", group.by = "condition")
+umap_crt_condition
+
+tsne_crt_condition <- DimPlot(crt_data, reduction = "tsne.harmony", group.by = "condition")
+tsne_crt_condition
+```
+
 - Creates comparative visualizations showing integration effectiveness
+
+```r
+# Add titles to individual UMAP plots
+umap_before <- umap_data + ggtitle("Clusters Before Batch Correction")
+umap_after  <- umap_crt  + ggtitle("Clusters After Batch Correction")
+
+# umap
+combine_umap <- umap_before + umap_after
+combine_umap
+
+# Add titles to individual t-SNE plots
+tsne_before <- tsne_data + ggtitle("Clusters Before Batch Correction")
+tsne_after  <- tsne_crt  + ggtitle("Clusters After Batch Correction")
+
+# tsne
+combine_tsne <- tsne_before + tsne_after
+combine_tsne
+```
 
 ---
 
@@ -591,20 +725,16 @@ write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
 
 - Automates cell type identification using reference gene signatures
 - Assigns cell types to clusters based on marker expression patterns
-- Verifies annotation quality through multiple visualization approaches
-
-### G. Data Exploration & Analysis
-
+- Verifies cell type annotation
 - Quantifies cell distribution across types and conditions
 - Enables flexible subsetting for focused analysis of specific populations
-- Exports fully annotated datasets for further investigation
 
-### H. Differential Expression Analysis
+### G. Differential Expression Analysis
 
 - Performs comprehensive gene expression comparisons:
     - Within cell types across experimental conditions
-    - Between different cell types
-    - Complex multi-factor comparisons
+    - Between different cell types regardless of conditions
+    - Complex multi-factor comparisons between conditions
 - Identifies statistically significant differentially expressed genes
 
 ### Outputs
