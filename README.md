@@ -44,7 +44,7 @@
 - Navigate to the directory containing `install_packages.R` file
 - Open terminal and run:
 
-```
+```r
 Rscript install_packages.R
 ```
 
@@ -80,7 +80,7 @@ source("install_packages.R")
 
 ### A. Reading and Creating Seurat Object
 
-```
+```r
 sample1 <- Read10X(data.dir = "samples/Normal/GSM7290760")
 sample1 <- CreateSeuratObject(counts = sample1, project = "N1")
 ```
@@ -95,14 +95,14 @@ sample1 <- CreateSeuratObject(counts = sample1, project = "N1")
 
 - Merging all control samples together:
 
-```
+```r
 normal_merged <- merge(sample1, y = c(sample2, sample3, sample4, sample5),
                        add.cell.ids = c("N1", "N2", "N3", "N4", "N5"))
 ```
 
 - Merging all diseased samples together:
 
-```
+```r
 LM_merged <- merge(sample6, y = c(sample7, sample8, sample9, sample10),
                    add.cell.ids = c("LM1", "LM2", "LM3", "LM4", "LM5"))
 ```
@@ -111,14 +111,14 @@ LM_merged <- merge(sample6, y = c(sample7, sample8, sample9, sample10),
 
 - Control samples:
 
-```
+```r
 normal_merged <- AddMetaData(object = normal_merged,
                              metadata = "Normal", col.name = "condition")
 ```
 
 - Diseased samples:
 
-```
+```r
 LM_merged <- AddMetaData(object = LM_merged, 
                          metadata = "LM", col.name = "condition")
 ```
@@ -127,7 +127,7 @@ LM_merged <- AddMetaData(object = LM_merged,
 
 - Merging control and diseased samples together:
 
-```
+```r
 merged_samples <- merge(normal_merged, LM_merged)
 ```
 
@@ -140,12 +140,37 @@ merged_samples <- merge(normal_merged, LM_merged)
 ### A. Data Loading & Quality Control
 
 - Loads merged dataset from previous script (samples merger)
+
+```r
+rawdata <- merged_samples
+dim(rawdata)  # 38224 features and 36289 cells
+rm(merged_samples)
+```
+
 - Calculates mitochondrial gene percentage
+
+```r
+rawdata[["percent.mt"]] <- PercentageFeatureSet(rawdata, pattern = "^(?i)MT-")
+```
+
 - Visualizes QC metrics using violin plots
+
+```r
+Plot1 <- VlnPlot(rawdata, features = c("nFeature_RNA", "nCount_RNA", "percent.mt"),
+                 group.by = "condition", ncol = 3)
+Plot1
+```
+
 - Applies quality filters based on:
-    - Gene counts (200-6000 genes per cell)
-    - RNA counts (>2000 molecules per cell)
-    - Mitochondrial content (<10%)
+    - Gene counts
+    - RNA counts
+    - Mitochondrial content
+
+```r
+filtered_data <- subset(rawdata, subset = nFeature_RNA > 200
+                        & nFeature_RNA < 6000 & nCount_RNA > 2000 & percent.mt < 10)
+dim(filtered_data) # 38224 features and 16195 cells in filtered data
+```
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/01-rawdata.png" width="49%">
@@ -156,7 +181,7 @@ merged_samples <- merge(normal_merged, LM_merged)
 - **Before saving plots, adjust the plot viewing window size in RStudio to match the intended resolution and aspect ratio.**
 - **After resizing the plot window, save the plot using `ggsave()` with the following format:**
 
-```
+```r
 ggsave(file = "raw_data.png", Plot1, dpi = 600, bg = "white")
 ```
 
@@ -164,19 +189,19 @@ ggsave(file = "raw_data.png", Plot1, dpi = 600, bg = "white")
 
 - Normalizes data using log normalization
 
-```
+```r
 normalized_data <- NormalizeData(filtered_data, normalization.method = "LogNormalize", scale.factor = 10000)
 ```
 
 - Identifies highly variable genes
 
-```
+```r
 normalized_data <- FindVariableFeatures(normalized_data, selection.method = "vst", nfeatures = 2000)
 ```
 
 - Visualizes top variable features
 
-```
+```r
 top10 <- head(VariableFeatures(normalized_data), 10)
 top10
 ```
@@ -187,7 +212,7 @@ top10
 
 - Performs scaling of highly variable features and performs PCA
 
-```
+```r
 scaled_data <- ScaleData(normalized_data)
 scaled_data <- RunPCA(scaled_data, features = VariableFeatures(object = scaled_data))
 pca_plot <- DimPlot(scaled_data, reduction = "pca")
@@ -197,7 +222,7 @@ pca_plot
 **Note:**
 - **If you want to perform scaling of all genes, then run the following command instead of the previous one:**
 
-```
+```r
 all.genes <- rownames(normalized_data)
 scaled_data <- ScaleData(normalized_data, features = all.genes)
 scaled_data <- RunPCA(scaled_data, features = all.genes)
@@ -207,14 +232,14 @@ pca_plot
 
 - Determines optimal dimensions using elbow plot
 
-```
+```r
 elbow <- ElbowPlot(scaled_data, ndim = 50)
 elbow
 ```
 
 - Clusters cells using graph-based clustering
 
-```
+```r
 data <- FindNeighbors(scaled_data, dims = 1:20)
 data <- FindClusters(data, resolution = 0.6, algorithm = 4)
 levels(data)
@@ -222,14 +247,14 @@ levels(data)
 
 - Performs non-linear dimensionality reduction (UMAP & t-SNE)
 
-```
+```r
 data <- RunUMAP(data, dims = 1:20)
 data <- RunTSNE(data, dims = 1:20)
 ```
 
 - Visualizes clusters with and without conditions
 
-```
+```r
 umap <- DimPlot(data, reduction = "umap", label = TRUE)
 umap
 
@@ -279,9 +304,114 @@ tSNE_condition
 ### D. Cell Type Annotation
 
 - Uses ScType database for automated cell type identification
-- Annotates clusters based on brain tissue markers
+- Annotates clusters based on tissue markers
 - Assigns cell types and handles low-confidence annotations
 - Updates metadata with cell type classifications
+
+```r
+# load gene set preparation function
+source("https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/R/gene_sets_prepare.R")
+# load cell type annotation function
+source("https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/R/sctype_score_.R")
+
+# DB file
+db_ <- "https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/ScTypeDB_full.xlsx";
+tissue <- "Immune system" # e.g. Immune system,Pancreas,Liver,Eye,Kidney,Brain,Lung,Adrenal,Heart,Intestine,Muscle,Placenta,Spleen,Stomach,Thymus 
+
+# prepare gene sets
+gs_list <- gene_sets_prepare(db_, tissue)
+
+# ==============================================================================
+# Run scType Annotation
+# ==============================================================================
+# check Seurat object version (scRNA-seq matrix extracted differently in Seurat v4/v5)
+seurat_package_v5 <- isFALSE('counts' %in% names(attributes(data[["RNA"]])));
+print(sprintf("Seurat object %s is used", ifelse(seurat_package_v5, "v5", "v4")))
+
+# extract scaled scRNA-seq matrix
+scRNAseqData_scaled <- if (seurat_package_v5) as.matrix(data[["RNA"]]$scale.data) else as.matrix(data[["RNA"]]@scale.data)
+
+# run ScType
+es.max <- sctype_score(scRNAseqData = scRNAseqData_scaled, scaled = TRUE, gs = gs_list$gs_positive, gs2 = gs_list$gs_negative)
+
+# merge by cluster
+cL_resutls <- do.call("rbind", lapply(unique(data@meta.data$seurat_clusters), function(cl){
+  es.max.cl = sort(rowSums(es.max[ ,rownames(data@meta.data[data@meta.data$seurat_clusters==cl, ])]), decreasing = !0)
+  head(data.frame(cluster = cl, type = names(es.max.cl), scores = es.max.cl, ncells = sum(data@meta.data$seurat_clusters==cl)), 10)
+}))
+sctype_scores <- cL_resutls %>% group_by(cluster) %>% top_n(n = 1, wt = scores)  
+
+# set low-confident (low ScType score) clusters to "unknown"
+sctype_scores$type[as.numeric(as.character(sctype_scores$scores)) < sctype_scores$ncells/4] <- "Unknown"
+print(sctype_scores[,1:3])
+write.csv(sctype_scores, file = "Celltypes.csv")
+
+# Convert sctype_scores to a data frame if it isn't already
+sctype_scores <- as.data.frame(sctype_scores)
+
+# Extract the cluster and cell type columns
+cluster_ids <- sctype_scores$cluster
+cell_types <- sctype_scores$type
+
+# Create a named vector for the new cluster identities
+new_cluster_ids <- cell_types
+names(new_cluster_ids) <- cluster_ids
+
+# Rename the cluster identities in the object
+data <- RenameIdents(data, new_cluster_ids)
+levels(data)
+
+# Overlay the identified cell types on UMAP plot
+data@meta.data$sctype_classification = ""
+for(j in unique(sctype_scores$cluster)){
+  cl_type = sctype_scores[sctype_scores$cluster==j,]; 
+  data@meta.data$sctype_classification[data@meta.data$seurat_clusters == j] = as.character(cl_type$type[1])
+}
+```
+
+### E. Visualization & Analysis
+
+- Generates annotated UMAP/t-SNE plots
+- Creates condition-split visualizations
+- Counts cell distribution across types and conditions
+- Saves annotated dataset
+
+```r
+# ==============================================================================
+# Count Cells by Cell Type and Condition
+# ==============================================================================
+# Number of cells in each condition
+# Create the table
+num_of_cells <- table(data@meta.data$sctype_classification, data@meta.data$condition)
+# Convert to data frame
+num_of_cells_df <- as.data.frame.matrix(num_of_cells)
+num_of_cells_df
+# Save as CSV
+write.csv(num_of_cells_df, file = "number_of_cells_in_conditions.csv", row.names = TRUE)
+
+# ==============================================================================
+# VISUALIZE ANNOTATED DATA
+# ==============================================================================
+
+# umap and tsne plots
+umap_annt <- DimPlot(data, reduction = "umap", label = FALSE,
+                     repel = TRUE, group.by = 'sctype_classification')        
+umap_annt
+
+tsne_annt <- DimPlot(data, reduction = "tsne", label = FALSE,
+                     repel = TRUE, group.by = 'sctype_classification')        
+tsne_annt
+
+umap_annt_condition <- DimPlot(data, reduction = "umap", label = FALSE,
+                               repel = TRUE, group.by = 'sctype_classification',
+                               split.by = "condition")        
+umap_annt_condition
+
+tsne_annt_condition <- DimPlot(data, reduction = "tsne", label = FALSE,
+                               repel = TRUE, group.by = 'sctype_classification',
+                               split.by = "condition")        
+tsne_annt_condition
+```
 
 ---
 
@@ -304,16 +434,28 @@ tSNE_condition
 
 ![tsne-annotated-condition](data/13-tsne_annotated_condition.png)
 
-### E. Visualization & Analysis
-
-- Generates annotated UMAP/t-SNE plots
-- Creates condition-split visualizations
-- Counts cell distribution across types and conditions
-- Saves annotated dataset
+---
 
 ### F. Differential Expression Analysis
 
 - Subsets specific cell types if needed
+
+```r
+# cells to keep
+cells <- c("Memory CD4+ T cells",
+           "Naive CD4+ T cells",
+           "Cancer cells",
+           "CD8+ NKT-like cells",
+           "Natural killer  cells")
+# Subset based on metadata column
+data_subset <- subset(data, subset = sctype_classification %in% cells)
+# Verify the subset
+levels(data_subset)
+table(data_subset@meta.data$sctype_classification)
+table(data_subset@meta.data$condition)
+saveRDS(data_subset, file = "data_subset.rds")
+```
+
 - Performs differential expression between:
     - Same cell type across conditions (Normal vs PD)
     - Different cell types within same condition
