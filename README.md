@@ -143,7 +143,7 @@ merged_samples <- merge(normal_merged, LM_merged)
 - Calculates mitochondrial gene percentage
 - Visualizes QC metrics using violin plots
 - Applies quality filters based on:
-    - Gene counts (200-5000 genes per cell)
+    - Gene counts (200-6000 genes per cell)
     - RNA counts (>2000 molecules per cell)
     - Mitochondrial content (<10%)
 
@@ -163,18 +163,88 @@ ggsave(file = "raw_data.png", Plot1, dpi = 600, bg = "white")
 ### B. Data Normalization & Feature Selection
 
 - Normalizes data using log normalization
+
+```
+normalized_data <- NormalizeData(filtered_data, normalization.method = "LogNormalize", scale.factor = 10000)
+```
+
 - Identifies highly variable genes
+
+```
+normalized_data <- FindVariableFeatures(normalized_data, selection.method = "vst", nfeatures = 2000)
+```
+
 - Visualizes top variable features
+
+```
+top10 <- head(VariableFeatures(normalized_data), 10)
+top10
+```
 
 <img src="data/03-hvfs.png" width="400px" />
 
 ### C. Dimensionality Reduction & Clustering
 
-- Scales data and performs PCA
+- Performs scaling of highly variable features and performs PCA
+
+```
+scaled_data <- ScaleData(normalized_data)
+scaled_data <- RunPCA(scaled_data, features = VariableFeatures(object = scaled_data))
+pca_plot <- DimPlot(scaled_data, reduction = "pca")
+pca_plot
+```
+
+**Note:**
+- **If you want to perform scaling of all genes, then run the following command instead of the previous one:**
+
+```
+all.genes <- rownames(normalized_data)
+scaled_data <- ScaleData(normalized_data, features = all.genes)
+scaled_data <- RunPCA(scaled_data, features = all.genes)
+pca_plot <- DimPlot(scaled_data, reduction = "pca")
+pca_plot
+```
+
 - Determines optimal dimensions using elbow plot
+
+```
+elbow <- ElbowPlot(scaled_data, ndim = 50)
+elbow
+```
+
 - Clusters cells using graph-based clustering
+
+```
+data <- FindNeighbors(scaled_data, dims = 1:20)
+data <- FindClusters(data, resolution = 0.6, algorithm = 4)
+levels(data)
+```
+
 - Performs non-linear dimensionality reduction (UMAP & t-SNE)
-- Visualizes clusters and conditions
+
+```
+data <- RunUMAP(data, dims = 1:20)
+data <- RunTSNE(data, dims = 1:20)
+```
+
+- Visualizes clusters with and without conditions
+
+```
+umap <- DimPlot(data, reduction = "umap", label = TRUE)
+umap
+
+tSNE <- DimPlot(data, reduction = "tsne", label = TRUE)
+tSNE
+
+umap_condition <- DimPlot(data, reduction = "umap", label = TRUE,
+                          split.by = "condition")
+umap_condition
+
+tSNE_condition <- DimPlot(data, reduction = "tsne", label = TRUE,
+                          split.by = "condition")
+tSNE_condition
+
+```
 
 ---
 
