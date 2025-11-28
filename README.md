@@ -18,9 +18,9 @@
 
 
 ## 📝 Overview
-<p align="justify"> <b>scRNA-seq-navigator</b> contains a comprehensive single-cell RNA sequencing (scRNA-seq) analysis pipeline designed for processed data following alignment. The pipeline encompasses data integration, quality control, batch effect correction, cell type annotation, differential gene expression analysis, and multi-dimensional visualization to extract meaningful biological insights from complex single-cell datasets. </p>
+<p align="justify"> <b>scRNA-seq-navigator</b> contains a comprehensive single-cell RNA sequencing (scRNA-seq) analysis pipeline designed for processed data following alignment. The pipeline leverages the robust <a href="https://doi.org/10.1016/j.cell.2019.05.031">Seurat (Stuart et al., 2019)</a> toolkit for essential analytical steps, including data integration, quality control, and batch-effect correction, and incorporates the <a href="https://doi.org/10.1038/s41467-022-28803-w">ScType database (Ianevski et al., 2022)</a> for refined cell-type annotation. It further facilitates differential gene expression analysis and multi-dimensional visualization to extract meaningful biological insights from complex single-cell datasets. </p>
 
-- The analyses provides end-to-end solutions for:
+- The analyses provide end-to-end solutions for:
     - **Data Integration & Processing:** Merging multiple datasets and experimental conditions
     - **Batch Effect Correction:** Addressing technical variations across different platforms and studies
     - **Cell Type Identification:** Automated annotation using reference gene signatures
