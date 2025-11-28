@@ -8,6 +8,7 @@
 - [Input Files Format](#input-files-format)
 - [01. Merging Samples](#01-merging-samples)
 - [02. Single Cell RNA Sequencing Analysis](#02-single-cell-rna-sequencing-analysis)
+      - [Manual Cell Type Annotation](#manual-cell-type-annotation)
 - [03. Multiple Datasets Integration](#03-multiple-datasets-integration)
 - [04. 3D UMAP and t-SNE Plots](#04-3d-umap-and-t-sne-plots)
 - [05. Volcano Plot](#05-volcano-plot)
@@ -373,7 +374,23 @@ for(j in unique(sctype_scores$cluster)){
 }
 ```
 
-### E. Visualization & Analysis
+### E. Manual Cell Type Annotation
+
+- Get the ScType database Excel file from [here](https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/ScTypeDB_full.xlsx)
+- Open the file and delete all existing data rows, keeping only the column headers (`tissueType`, `cellName`, `geneSymbolmore1`, etc)
+- Fill in the columns with your custom data:
+    - `tissueType`: Your tissue of interest (e.g., "Immune")
+    - `cellName`: The specific cell type (e.g., "T-cell")
+    - `geneSymbolmore1`: The positive gene markers for that cell type, separated by commas (e.g., "CD3D, CD3E, CD8A")
+- Save the file and provide its path to the sctype_annotate function in the code, as shown below
+
+```r
+# DB file
+db_ <- "data/ScTypeDB_full.xlsx";
+tissue <- "Immune system"
+```
+
+### F. Visualization & Analysis
 
 - Generates annotated UMAP/t-SNE plots
 - Creates condition-split visualizations
@@ -440,7 +457,7 @@ tsne_annt_condition
 
 ---
 
-### F. Differential Expression Analysis
+### G. Differential Expression Analysis
 
 - Subsets specific cell types if needed
 
