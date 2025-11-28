@@ -344,10 +344,10 @@ This script creates interactive 3D visualizations of single-cell data using UMAP
 
 | Description | Link |
 |---|---|
-| **View 3D umap:** | [3d-umap](data/16-3d_umap.html) |
-| **View Gene Expression in 3D umap:** | [3d-gene-umap](data/17-gene-3d_umap.html) |
-| **View 3D tsne:** | [3d-tsne](data/18-3d_tsne.html) |
-| **View Gene Expression in 3D tsne:** | [3d-gene-tsne](data/19-gene-3d_tsne.html) |
+| **View 3D umap:** | [3d-umap](https://usman4373.github.io/scRNA-seq-navigator/data/16-3d_umap.html) |
+| **View Gene Expression in 3D umap:** | [3d-gene-umap](https://usman4373.github.io/scRNA-seq-navigator/data/17-gene-3d_umap.html) |
+| **View 3D tsne:** | [3d-tsne](https://usman4373.github.io/scRNA-seq-navigator/data/18-3d_tsne.html) |
+| **View Gene Expression in 3D tsne:** | [3d-gene-tsne](https://usman4373.github.io/scRNA-seq-navigator/data/19-gene-3d_tsne.html) |
 
 ### Outputs
 
