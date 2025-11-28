@@ -250,7 +250,8 @@ source("https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/R/sct
 
 # DB file
 db_ <- "https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/ScTypeDB_full.xlsx";
-tissue <- "Immune system" # e.g. Immune system,Pancreas,Liver,Eye,Kidney,Brain,Lung,Adrenal,Heart,Intestine,Muscle,Placenta,Spleen,Stomach,Thymus 
+# Available tissues: Brain, Lung, Adrenal, Immune system, Eye, Pancreas, Liver, Heart, Intestine, Muscle, Thymus, Placenta, Spleen, Stomach
+tissue <- "Immune system"
 
 # prepare gene sets
 gs_list <- gene_sets_prepare(db_, tissue)
@@ -476,4 +477,5 @@ write.csv(degs_down, file = "Cancer_cells_dn_markers.csv")
 
 # ==============================================================================
 # END OF SCRIPT
+
 # ==============================================================================
