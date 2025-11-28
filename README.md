@@ -32,24 +32,26 @@
 | Script | Description |
 |--------|-------------|
 | `01-samples_merger.R` | Merges multiple scRNA-seq samples from different conditions into a unified dataset for analysis |
-| `02-scRNA-seqr.R` | Performs comprehensive scRNA-seq analysis including QC, clustering, cell type annotation, and differential expression analysis |
+| `02-scRNA-seqr.R` | Performs comprehensive scRNA-seq analysis, including QC, clustering, cell type annotation, and differential expression analysis |
 | `03-multiple-datasets-integrator.R` | Integrates multiple scRNA-seq datasets using Harmony to remove batch effects |
 | `04-umap-tsne-3d-plotr.R` | Creates interactive 3D visualizations of UMAP and t-SNE embeddings for enhanced data exploration |
 | `05-volcano_plotr.R` | Generates publication-ready volcano plots to visualize differential gene expression results |
 | `06-heatmapr.R` | Produces clustered heatmaps showing gene expression patterns across cell types and conditions |
 | `07-boxplotr.R` | Creates comparative box plots to analyze gene expression differences across experimental conditions and/or cell types |
 
+### NOTE: The code snippets in this README are for demonstration and can be found in their respective script files.
+
 ## Installation
 
-- Navigate to the directory containing `install_packages.R` file
-- Open terminal and run:
+- Navigate to the directory containing the `install_packages.R` file
+- Open a terminal and run:
 
-```r
+```
 Rscript install_packages.R
 ```
 
-- Alternatively, if the above does not work, open `install_packages.R` file in RStudio
-- Click the "Source" button in the top-right of the script editor OR in R console run:
+- Alternatively, if the above does not work, open the `install_packages.R` file in RStudio
+- Click the "Source" button in the top-right of the script editor OR in the R console run:
 
 ```
 # Navigate to the script directory first, then:
@@ -66,7 +68,7 @@ source("install_packages.R")
 
 ## 01. Merging Samples
 
-<p align="justify"> This script performs the initial data integration step for single-cell RNA sequencing (scRNA-seq) analysis by merging multiple samples from two experimental conditions (e.g Normal and Parkinson's Disease) into a unified Seurat object. </p>
+<p align="justify"> This script performs the initial data integration step for single-cell RNA sequencing (scRNA-seq) analysis by merging multiple samples from two experimental conditions (e.g, Normal and Parkinson's Disease) into a unified Seurat object. </p>
 
 ### Purpose
 
@@ -93,14 +95,14 @@ sample1 <- CreateSeuratObject(counts = sample1, project = "N1")
 
 ### B. Merging Multiple Samples
 
-- Merging all control samples together:
+- Merging all control samples:
 
 ```r
 normal_merged <- merge(sample1, y = c(sample2, sample3, sample4, sample5),
                        add.cell.ids = c("N1", "N2", "N3", "N4", "N5"))
 ```
 
-- Merging all diseased samples together:
+- Merging all diseased samples:
 
 ```r
 LM_merged <- merge(sample6, y = c(sample7, sample8, sample9, sample10),
@@ -125,7 +127,7 @@ LM_merged <- AddMetaData(object = LM_merged,
 
 ### D. Final Merging
 
-- Merging control and diseased samples together:
+- Merging control and diseased samples:
 
 ```r
 merged_samples <- merge(normal_merged, LM_merged)
@@ -171,6 +173,7 @@ filtered_data <- subset(rawdata, subset = nFeature_RNA > 200
                         & nFeature_RNA < 6000 & nCount_RNA > 2000 & percent.mt < 10)
 dim(filtered_data) # 38224 features and 16195 cells in filtered data
 ```
+- **Adjust `nFeature_RNA`, `nCount_RNA`, and `percent.mt` values according to your dataset**
 
 <div style="display:flex; justify-content:space-between;">
   <img src="data/01-rawdata.png" width="49%">
@@ -316,7 +319,8 @@ source("https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/R/sct
 
 # DB file
 db_ <- "https://raw.githubusercontent.com/IanevskiAleksandr/sc-type/master/ScTypeDB_full.xlsx";
-tissue <- "Immune system" # e.g. Immune system,Pancreas,Liver,Eye,Kidney,Brain,Lung,Adrenal,Heart,Intestine,Muscle,Placenta,Spleen,Stomach,Thymus 
+# Available tissues: Brain, Lung, Adrenal, Immune system, Eye, Pancreas, Liver, Heart, Intestine, Muscle, Placenta, Spleen, Stomach, Thymus
+tissue <- "Immune system"
 
 # prepare gene sets
 gs_list <- gene_sets_prepare(db_, tissue)
@@ -766,7 +770,7 @@ This script creates interactive 3D visualizations of single-cell data using UMAP
 ### B. Gene Expression Visualization
 
 - Maps gene expression patterns onto 3D UMAP and t-SNE space
-- Uses `HLA-DQA1` gene as example with adjustable expression scaling
+- Uses `HLA-DQA1` gene as an example with adjustable expression scaling
 - Creates color-coded plots showing expression levels
 - Generates interactive plots with cell-level information
 
@@ -809,8 +813,8 @@ degs$gene <- NULL
 
 ### B. Plot Generation
 
-- Uses EnhancedVolcano package for advanced plotting
-- Maps log2 fold changes against adjusted p-values (fdr)
+- Uses the `EnhancedVolcano` package for advanced plotting
+- Maps log2 fold changes against adjusted p-values (FDR)
 - Applies statistical cutoffs for significance
 - Customizes colors for different significance categories
 
